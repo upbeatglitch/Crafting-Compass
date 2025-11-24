@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upbeat's Crafting Compass</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 40px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #007bff;
+            text-align: center;
+        }
+        .header-text {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            color: #666;
+        }
+        form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            align-items: stretch;
+        }
+        input[type="text"] {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .result-box {
+            border-top: 2px solid #ccc;
+            padding-top: 20px;
+        }
+        .result-box h2 {
+            color: #007bff;
+        }
+        .result-item {
+            margin-bottom: 10px;
+        }
+        .result-item strong {
+            display: inline-block;
+            width: 100px; 
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✨ Upbeat's Crafting Compass ✨</h1>
+        <p class="header-text"></p>
+
+        <form method="POST">
+            <input type="text" id="crystal_name" name="crystal_name" placeholder="Input a crystal (e.g., Earth, Water)" required>
+            <button type="submit">Search</button>
+        </form>
+
+        {% if result %}
+            <div class="result-box">
+                <h2>{{ result.name }}</h2>
+                <div class="result-item">
+                    <strong>HQ:</strong> {{ result.hq }}
+                </div>
+                <div class="result-item">
+                    <strong>Success:</strong> {{ result.success }}
+                </div>
+            </div>
+        {% else %}
+             <p>Enter a crystal name above to see the best crafting conditions!</p>
+        {% endif %}
+
+        <p class="header-text" style="margin-top: 30px;">Thank you for using Upbeat's crafting compass</p>
+    </div>
+</body>
+</html>
