@@ -3,7 +3,6 @@ from flask import Flask, render_template, request
 app = Flask(__name__)
 
 # --- Crystal Data Dictionary ---
-# This dictionary holds all your crystal information, making it easy to look up.
 CRYSTAL_DATA = {
     "earth": {
         "name": "Earth Crystal",
@@ -55,6 +54,13 @@ CRYSTAL_DATA = {
     }
 }
 
+# --- ADDED: Create a reverse lookup for HQ conditions ---
+# Maps normalized HQ condition string to the crystal key (e.g., 'earth').
+HQ_CONDITION_LOOKUP = {
+    data["hq"].lower().replace(' ', ''): crystal_key
+    for crystal_key, data in CRYSTAL_DATA.items()
+}
+
 # --- Create a reverse lookup for the new HQ names (newly added feature) ---
 # Maps normalized HQ name alias to the crystal key (e.g., 'fire').
 HQ_NAME_MAP = {
@@ -98,6 +104,7 @@ def crafting_compass():
             crystal_key = HQ_NAME_LOOKUP.get(normalized_input)
         
         # 3. Try the HQ Condition reverse lookup (e.g., 'darksdaywindsdaynewmoon...')
+        # This now works because the dictionary is defined above.
         elif normalized_input in HQ_CONDITION_LOOKUP:
             crystal_key = HQ_CONDITION_LOOKUP.get(normalized_input)
             
