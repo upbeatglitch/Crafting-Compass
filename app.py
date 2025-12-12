@@ -54,15 +54,15 @@ CRYSTAL_DATA = {
     }
 }
 
-# --- ADDED: Create a reverse lookup for HQ conditions ---
-# Maps normalized HQ condition string to the crystal key (e.g., 'earth').
+# 🚨 MISSING DICTIONARY (CAUSE OF THE ERROR) - ADDED HERE 🚨
+# Create a reverse lookup for HQ conditions
+# Maps normalized HQ condition string (no spaces) to the crystal key (e.g., 'earth').
 HQ_CONDITION_LOOKUP = {
     data["hq"].lower().replace(' ', ''): crystal_key
     for crystal_key, data in CRYSTAL_DATA.items()
 }
 
 # --- Create a reverse lookup for the new HQ names (newly added feature) ---
-# Maps normalized HQ name alias to the crystal key (e.g., 'fire').
 HQ_NAME_MAP = {
     "inferno": "fire",
     "terra": "earth",
@@ -74,22 +74,18 @@ HQ_NAME_MAP = {
     "twilight": "dark"
 }
 HQ_NAME_LOOKUP = {
-    # Normalize keys by removing spaces
     hq_name: crystal_key
     for hq_name, crystal_key in HQ_NAME_MAP.items()
 }
 
 @app.route('/', methods=['GET', 'POST'])
 def crafting_compass():
-    # Initial message before any search
     result = None
     crystal_input = None
 
-    # Check if the user has submitted the form
     if request.method == 'POST':
-        # Get the input from the web form and normalize it for case-insensitive and space-insensitive matching
+        # Get the input and aggressively normalize it for searching
         crystal_input = request.form.get('crystal_name', '').strip()
-        # Remove ' crystal', convert to lowercase, and remove all spaces for aggressive matching
         normalized_input = crystal_input.lower().replace(' crystal', '').replace(' ', '')
 
         crystal_key = None
@@ -104,7 +100,7 @@ def crafting_compass():
             crystal_key = HQ_NAME_LOOKUP.get(normalized_input)
         
         # 3. Try the HQ Condition reverse lookup (e.g., 'darksdaywindsdaynewmoon...')
-        # This now works because the dictionary is defined above.
+        # This line will now work correctly
         elif normalized_input in HQ_CONDITION_LOOKUP:
             crystal_key = HQ_CONDITION_LOOKUP.get(normalized_input)
             
@@ -114,7 +110,6 @@ def crafting_compass():
 
         # Process the result
         if data:
-            # Crystal found, package the result data.
             result = {
                 "name": data["name"],
                 "hq": data["hq"],
@@ -137,5 +132,4 @@ def crafting_compass():
 
 # --- Run the Application ---
 if __name__ == '__main__':
-    # Set debug=True for easier development/testing
     app.run(debug=True)
