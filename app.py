@@ -75,7 +75,7 @@ def crafting_compass():
             result = {
                 "name": data["name"],
                 "hq": data["hq"],
-                "success": data["success"]
+                "success": data["success"],
                 "escutcheon enchantment HQ": data["escutcheon enchantment HQ"]
             }
         else:
