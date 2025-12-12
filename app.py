@@ -3,6 +3,7 @@ from flask import Flask, render_template, request
 app = Flask(__name__)
 
 # --- Crystal Data Dictionary ---
+# This dictionary holds all your crystal information, making it easy to look up.
 CRYSTAL_DATA = {
     "earth": {
         "name": "Earth Crystal",
@@ -38,7 +39,7 @@ CRYSTAL_DATA = {
         "name": "Dark Crystal",
         "hq": "Darksday, New moon, North East",
         "success": "Darksday, Full moon, North",
-        "escutcheon enchantment HQ": "Darksday, New Moon, North" 
+        "escutceon": "Darksday, New Moon, North" 
     },
     "light": {
         "name": "Light Crystal",
@@ -54,75 +55,37 @@ CRYSTAL_DATA = {
     }
 }
 
-# --- FIX 1: ADDED MISSING DICTIONARY FOR HQ CONDITION LOOKUP ---
-HQ_CONDITION_LOOKUP = {
-    data["hq"].lower().replace(' ', ''): crystal_key
-    for crystal_key, data in CRYSTAL_DATA.items()
-}
-
-# --- Create a reverse lookup for the new HQ names ---
-HQ_NAME_MAP = {
-    "inferno": "fire",
-    "terra": "earth",
-    "torrent": "water",
-    "cyclone": "wind",
-    "glacier": "ice",
-    "plasma": "lightning",
-    "aurora": "light",
-    "twilight": "dark"
-}
-HQ_NAME_LOOKUP = {
-    hq_name: crystal_key
-    for hq_name, crystal_key in HQ_NAME_MAP.items()
-}
-
+# --- Route for the Home Page and Logic ---
 @app.route('/', methods=['GET', 'POST'])
 def crafting_compass():
+    # Initial message before any search
     result = None
     crystal_input = None
-
+    
+    # Check if the user has submitted the form
     if request.method == 'POST':
-        crystal_input = request.form.get('crystal_name', '').strip()
-        normalized_input = crystal_input.lower().replace(' crystal', '').replace(' ', '')
-
-        crystal_key = None
-        data = None
-
-        # 1. Look up by primary crystal key
-        if normalized_input in CRYSTAL_DATA:
-            crystal_key = normalized_input
+        # Get the input from the web form and convert to lowercase
+        crystal_input = request.form.get('crystal_name', '').lower().replace(' crystal', '')
         
-        # 2. Look up by the HQ Name alias
-        elif normalized_input in HQ_NAME_LOOKUP:
-            crystal_key = HQ_NAME_LOOKUP.get(normalized_input)
+        # Look up the data in the dictionary
+        data = CRYSTAL_DATA.get(crystal_input)
         
-        # 3. Look up by the HQ Condition string
-        elif normalized_input in HQ_CONDITION_LOOKUP:
-            crystal_key = HQ_CONDITION_LOOKUP.get(normalized_input)
-            
-        if crystal_key:
-            data = CRYSTAL_DATA.get(crystal_key)
-
-        # Process the result
         if data:
+            # Crystal found, package the result data
             result = {
                 "name": data["name"],
                 "hq": data["hq"],
-                "success": data["success"],  # <-- FIX 2: COMMA IS HERE
+                "success": data["success"]
                 "escutcheon enchantment HQ": data["escutcheon enchantment HQ"]
             }
         else:
-            example_names = ['Earth', 'Fire', 'Terra', 'Inferno']
-            example_condition = CRYSTAL_DATA['earth']['hq']
-            result = {
-                "name": "Crystal Not Found", 
-                "hq": "N/A", 
-                "success": f"Please enter a valid crystal name (e.g., '{example_names[0]}', '{example_names[2]}') or the full HQ crafting conditions (e.g., '{example_condition}').",
-                "escutcheon enchantment HQ": "N/A"
-            }
+            # Crystal not found
+            result = {"name": "Crystal Not Found", "hq": "N/A", "success": "Please enter a valid crystal name (e.g., 'earth', 'wind')."}
 
+    # Render the HTML template, passing the result data to display
     return render_template('compass.html', result=result, crystal_input=crystal_input)
 
 # --- Run the Application ---
 if __name__ == '__main__':
+    # Set debug=True for easier development/testing
     app.run(debug=True)
