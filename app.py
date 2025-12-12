@@ -54,15 +54,13 @@ CRYSTAL_DATA = {
     }
 }
 
-# 🚨 MISSING DICTIONARY (CAUSE OF THE ERROR) - ADDED HERE 🚨
-# Create a reverse lookup for HQ conditions
-# Maps normalized HQ condition string (no spaces) to the crystal key (e.g., 'earth').
+# --- FIX 1: ADDED MISSING DICTIONARY FOR HQ CONDITION LOOKUP ---
 HQ_CONDITION_LOOKUP = {
     data["hq"].lower().replace(' ', ''): crystal_key
     for crystal_key, data in CRYSTAL_DATA.items()
 }
 
-# --- Create a reverse lookup for the new HQ names (newly added feature) ---
+# --- Create a reverse lookup for the new HQ names ---
 HQ_NAME_MAP = {
     "inferno": "fire",
     "terra": "earth",
@@ -84,27 +82,24 @@ def crafting_compass():
     crystal_input = None
 
     if request.method == 'POST':
-        # Get the input and aggressively normalize it for searching
         crystal_input = request.form.get('crystal_name', '').strip()
         normalized_input = crystal_input.lower().replace(' crystal', '').replace(' ', '')
 
         crystal_key = None
         data = None
 
-        # 1. Try to look up by primary crystal key (e.g., 'earth')
+        # 1. Look up by primary crystal key
         if normalized_input in CRYSTAL_DATA:
             crystal_key = normalized_input
         
-        # 2. Try to look up by the HQ Name alias (e.g., 'terra' or 'inferno')
+        # 2. Look up by the HQ Name alias
         elif normalized_input in HQ_NAME_LOOKUP:
             crystal_key = HQ_NAME_LOOKUP.get(normalized_input)
         
-        # 3. Try the HQ Condition reverse lookup (e.g., 'darksdaywindsdaynewmoon...')
-        # This line will now work correctly
+        # 3. Look up by the HQ Condition string
         elif normalized_input in HQ_CONDITION_LOOKUP:
             crystal_key = HQ_CONDITION_LOOKUP.get(normalized_input)
             
-        # Get the data if a key was found
         if crystal_key:
             data = CRYSTAL_DATA.get(crystal_key)
 
@@ -113,11 +108,10 @@ def crafting_compass():
             result = {
                 "name": data["name"],
                 "hq": data["hq"],
-                "success": data["success"],
+                "success": data["success"],  # <-- FIX 2: COMMA IS HERE
                 "escutcheon enchantment HQ": data["escutcheon enchantment HQ"]
             }
         else:
-            # Crystal not found
             example_names = ['Earth', 'Fire', 'Terra', 'Inferno']
             example_condition = CRYSTAL_DATA['earth']['hq']
             result = {
@@ -127,7 +121,6 @@ def crafting_compass():
                 "escutcheon enchantment HQ": "N/A"
             }
 
-    # Render the HTML template, passing the result data to display
     return render_template('compass.html', result=result, crystal_input=crystal_input)
 
 # --- Run the Application ---
